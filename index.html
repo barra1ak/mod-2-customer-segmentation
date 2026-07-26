@@ -97,7 +97,26 @@
     .completion-mark{display:grid;width:82px;height:82px;place-items:center;margin:0 auto 18px;border-radius:50%;background:var(--gold);color:var(--black);font-size:2.2rem;font-weight:900}
     .completion p{max-width:700px;color:var(--muted)}
     .footer{padding:20px 0 2px;color:var(--muted);text-align:center;font-size:.82rem}
-    @media(max-width:960px){.lens-grid,.builder-shell{grid-template-columns:1fr}}
+    .walkthrough{margin:0 0 24px;border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;background:#fff}
+    .walkthrough-head{background:var(--black);color:var(--white);padding:20px 22px}
+    .walkthrough-head .kicker{margin-bottom:5px;color:var(--gold);font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+    .walkthrough-head h3{margin-bottom:4px;font-size:1.35rem}
+    .walkthrough-head p{margin-bottom:0;color:#e6e6e6}
+    .walkthrough-body{padding:22px}
+    .walkthrough-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .walk-step{border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px;background:#faf9f6}
+    .walk-step-num{display:grid;width:32px;height:32px;place-items:center;margin-bottom:9px;border-radius:50%;background:var(--gold);color:var(--black);font-weight:900}
+    .walk-step p{margin-bottom:0;color:var(--muted);font-size:.9rem}
+    .worked-answer{margin-top:16px;border-left:6px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;background:var(--green-soft);padding:17px}
+    .instruction-list{display:grid;gap:10px;margin:18px 0}
+    .instruction-row{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start}
+    .instruction-row span{display:grid;width:30px;height:30px;place-items:center;border-radius:50%;background:var(--black);color:var(--gold);font-weight:900;font-size:.82rem}
+    .selection-status{margin-top:14px;border-radius:12px;background:#fff;padding:12px;border:1px solid var(--border);font-size:.88rem}
+    .quick-example{width:100%;margin-top:10px;border:1px solid var(--gold-dark);border-radius:12px;background:var(--gold-light);padding:11px;color:#624918;font-weight:800;text-align:left}
+    .feedback-section{margin-top:12px;padding-top:12px;border-top:1px solid currentColor}
+    .feedback-list{margin:8px 0 0;padding-left:20px}
+    .mini-guide{margin-top:8px;color:var(--muted);font-size:.82rem}
+    @media(max-width:960px){.lens-grid,.builder-shell,.walkthrough-steps{grid-template-columns:1fr}}
     @media(max-width:760px){.choice-grid,.customer-grid,.definition-grid,.coach-grid{grid-template-columns:1fr}.field-card.full{grid-column:auto}.test-card{grid-template-columns:1fr}}
     @media(max-width:600px){.shell{width:min(100% - 16px,1180px);margin:8px auto 22px}.hero{border-radius:17px}.hero-line{height:6px}.hero-inner{padding:27px 20px 24px}.eyebrow{font-size:.68rem}.hero-copy{font-size:.96rem}.objective{grid-template-columns:auto 1fr;padding:15px}.progress{margin:14px 0;padding:14px 15px}.progress-head{flex-direction:column;gap:3px}.panel{border-radius:18px;padding:22px 17px}.buttons{flex-direction:column}.btn{width:100%}}
     @media print{body{background:#fff}.shell{width:100%;margin:0}.hero,.panel,.progress{box-shadow:none}.buttons,.progress{display:none!important}.panel{display:block!important;page-break-after:always}}
@@ -147,12 +166,38 @@
 
   <section id="step3" class="panel">
     <h2>Step 3: Build a customer segment</h2>
-    <p class="intro">Choose one segmentation lens, review the customer files, and select customers who share a meaningful characteristic under that lens.</p>
+    <p class="intro">First, work through a simple example. Then use the same three-part process with the customer files: choose one lens, find a specific shared trait, and explain why that trait matters.</p>
+
+    <section class="walkthrough" aria-label="Worked segmentation example">
+      <div class="walkthrough-head">
+        <div class="kicker">Let’s do one together</div>
+        <h3>Example: Small livestock operations</h3>
+        <p>Follow the reasoning—not just the final answer.</p>
+      </div>
+      <div class="walkthrough-body">
+        <div class="walkthrough-steps">
+          <article class="walk-step"><div class="walk-step-num">1</div><h3>Choose one lens</h3><p>We choose <strong>Demographics</strong> because we want to group customers by observable operation size.</p></article>
+          <article class="walk-step"><div class="walk-step-num">2</div><h3>Find the shared trait</h3><p>Farm A has 140 dairy cows and Farm B has 175 dairy cows. Both are <strong>small livestock operations</strong>.</p></article>
+          <article class="walk-step"><div class="walk-step-num">3</div><h3>Explain why it matters</h3><p>Smaller operations may value affordable options, simple implementation, and personal support.</p></article>
+        </div>
+        <div class="worked-answer"><strong>A complete answer could be:</strong><br>“Using the demographic lens, I grouped Farm A and Farm B as Small Livestock Operations because both have relatively small herds. They may respond similarly to an affordable, easy-to-implement program with personal service.”</div>
+      </div>
+    </section>
+
+    <div class="callout"><strong>Now it’s your turn:</strong> You do not need to find the one perfect answer. You need a defensible group where at least two customers share one clear trait under the lens you selected.</div>
+
     <div class="builder-shell">
       <aside class="builder-control">
         <label for="segmentLens">Segmentation lens</label>
         <select id="segmentLens"><option value="">Choose one lens</option><option value="demographic">Demographics</option><option value="usage">Product usage</option><option value="psychographic">Psychographics</option></select>
         <p id="lensHelper" class="helper">The lens determines which customer similarities should guide your selection.</p>
+        <div class="instruction-list">
+          <div class="instruction-row"><span>1</span><div><strong>Choose a lens.</strong><div class="mini-guide">Use only one type of information at a time.</div></div></div>
+          <div class="instruction-row"><span>2</span><div><strong>Select 2–3 matching customers.</strong><div class="mini-guide">Look for one exact trait they share.</div></div></div>
+          <div class="instruction-row"><span>3</span><div><strong>Explain why the trait matters.</strong><div class="mini-guide">Connect the similarity to what they may value.</div></div></div>
+        </div>
+        <div id="selectionStatus" class="selection-status"><strong>Selected:</strong> 0 customers</div>
+        <button id="loadExample" class="quick-example" type="button">Show me a valid example selection</button>
         <div class="callout"><strong>Remember:</strong> Customers do not belong together simply because they all work in agriculture.</div>
       </aside>
       <div id="customerGrid" class="customer-grid"></div>
@@ -220,50 +265,73 @@
   function showStep(index){currentStep=Math.max(0,Math.min(index,5));stepIds.forEach((id,i)=>$(id).classList.toggle('active',i===currentStep));if(currentStep<4){$('progressText').textContent=`Step ${currentStep+1} of 4`;$('progressTitle').textContent=stepTitles[currentStep];$('progressBar').style.width=`${(currentStep+1)*25}%`}else if(currentStep===4){$('progressText').textContent='Coaching';$('progressTitle').textContent=stepTitles[4];$('progressBar').style.width='100%'}else{$('progressText').textContent='Complete';$('progressTitle').textContent='Segmentation activity finished';$('progressBar').style.width='100%'}window.scrollTo({top:0,behavior:'smooth'})}
   function renderScenarios(){$('scenarioList').innerHTML=scenarios.map((s,i)=>`<article class="scenario-card" data-scenario="${i}"><div class="scenario-head"><div class="scenario-number">${i+1}</div><div><h3>Customer grouping</h3><p>${s.prompt}</p></div></div><div class="choice-grid"><button class="choice" data-index="${i}" data-choice="demographic">Demographics</button><button class="choice" data-index="${i}" data-choice="usage">Product usage</button><button class="choice" data-index="${i}" data-choice="psychographic">Psychographics</button></div><div class="feedback"></div></article>`).join('');document.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',handleChoice))}
   function handleChoice(e){const b=e.currentTarget,i=Number(b.dataset.index),a=b.closest('[data-scenario]');if(a.dataset.answered==='true')return;a.dataset.answered='true';answered++;const s=scenarios[i],ok=b.dataset.choice===s.answer;if(ok)correct++;a.querySelectorAll('[data-choice]').forEach(c=>{c.disabled=true;if(c.dataset.choice===s.answer)c.classList.add('correct')});if(!ok)b.classList.add('incorrect');const f=a.querySelector('.feedback');f.className=`feedback show ${ok?'good':'watch'}`;f.innerHTML=`<strong>${ok?'Correct':'Review the defining characteristic'}.</strong><br>${s.explanation}`;if(answered===scenarios.length){$('quizSummary').className=`feedback show ${correct>=4?'good':'watch'}`;$('quizSummary').innerHTML=`<strong>You identified ${correct} of ${scenarios.length} correctly.</strong><br>${correct>=4?'You are ready to apply the three segmentation methods.':'Remember: demographics describe observable characteristics, product usage describes what customers use or produce, and psychographics describe how they buy and define value.'}`;$('openBuilder').disabled=false}}
-  function renderCustomers(){$('customerGrid').innerHTML=customers.map(c=>`<button class="customer-card" data-customer="${c.id}"><span class="customer-state">Select customer</span><h3>${c.name}</h3><ul>${c.facts.map(f=>`<li>${f}</li>`).join('')}</ul></button>`).join('');document.querySelectorAll('[data-customer]').forEach(card=>card.addEventListener('click',()=>{const lens=$('segmentLens').value;if(!lens){$('lensHelper').textContent='Choose a segmentation lens before selecting customer files.';return}const id=card.dataset.customer;if(selectedCustomers.has(id)){selectedCustomers.delete(id);card.classList.remove('selected');card.querySelector('.customer-state').textContent='Select customer'}else{selectedCustomers.add(id);card.classList.add('selected');card.querySelector('.customer-state').textContent='Selected'}segmentValidated=false;$('openTests').disabled=true}))}
+  function renderCustomers(){
+    $('customerGrid').innerHTML=customers.map(c=>`<button class="customer-card" type="button" data-customer="${c.id}"><span class="customer-state">Select customer</span><h3>${c.name}</h3><ul>${c.facts.map(f=>`<li>${f}</li>`).join('')}</ul></button>`).join('');
+    document.querySelectorAll('[data-customer]').forEach(card=>card.addEventListener('click',()=>{
+      const lens=$('segmentLens').value;
+      if(!lens){$('lensHelper').textContent='Start here: choose Demographics, Product usage, or Psychographics. Then the activity can help you identify matching customers.';return}
+      const id=card.dataset.customer;
+      if(selectedCustomers.has(id)){selectedCustomers.delete(id);card.classList.remove('selected');card.querySelector('.customer-state').textContent='Select customer'}
+      else{selectedCustomers.add(id);card.classList.add('selected');card.querySelector('.customer-state').textContent='Selected'}
+      updateSelectionStatus();segmentValidated=false;$('openTests').disabled=true;
+    }));
+    updateSelectionStatus();
+  }
   function sharedTraits(selected,lens){if(!selected.length)return[];return selected[0].traits[lens].filter(t=>selected.every(c=>c.traits[lens].includes(t)))}
   function formatLens(l){return l==='usage'?'Product usage':l.charAt(0).toUpperCase()+l.slice(1)}
+  const traitLabels={large:'large-scale operations',small:'small-scale operations',medium:'medium-sized operations',grain:'grain producers',precision:'precision-technology users','traditional-equipment':'traditional-equipment users',livestock:'livestock operations',technology:'technology users','specialty-crops':'specialty-crop producers',pest:'operations with frequent pest-management needs',performance:'performance-focused buyers',relationship:'relationship-and-service-focused buyers',evidence:'evidence-driven buyers',price:'price-sensitive buyers',innovation:'innovation-oriented buyers'};
+  function readableTraits(items){return items.map(x=>traitLabels[x]||x.replaceAll('-',' '))}
+  function updateSelectionStatus(){const count=selectedCustomers.size;$('selectionStatus').innerHTML=`<strong>Selected:</strong> ${count} customer${count===1?'':'s'}${count?` — ${customers.filter(c=>selectedCustomers.has(c.id)).map(c=>c.name).join(', ')}`:''}`;}
+  function validExamples(lens){const groups={};customers.forEach(c=>c.traits[lens].forEach(t=>(groups[t]??=[]).push(c)));return Object.entries(groups).filter(([,cs])=>cs.length>=2).sort((a,b)=>b[1].length-a[1].length)}
   function checkSegment(){
-    const lens=$('segmentLens').value;
-    const name=$('segmentName').value.trim();
-    const offer=$('segmentOffer').value.trim();
-    const logic=$('segmentLogic').value.trim();
-    const f=$('builderFeedback');
+    const lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim(),f=$('builderFeedback');
     const selected=customers.filter(c=>selectedCustomers.has(c.id));
     const missing=[];
-
-    if(!lens) missing.push('choose a segmentation lens');
-    if(selected.length<2) missing.push('select at least two customers');
-    if(!name) missing.push('name the segment');
-    if(!offer) missing.push('describe what the segment may value');
-    if(!logic) missing.push('explain the shared characteristic');
-
+    if(!lens) missing.push('choose one segmentation lens');
+    if(selected.length<2) missing.push(`select at least two customers (you currently have ${selected.length})`);
+    if(!name) missing.push('give the segment a short name');
+    if(!offer) missing.push('describe one thing the segment may value');
+    if(!logic) missing.push('write one sentence explaining the shared trait');
     if(missing.length){
       f.className='feedback risk show';
-      f.innerHTML=`<strong>Almost there.</strong><br>Please ${missing.join(', ')}.`;
-      segmentValidated=false;
-      $('openTests').disabled=true;
-      return;
+      f.innerHTML=`<strong>You are close. Here is exactly what is still needed:</strong><ul class="feedback-list">${missing.map(m=>`<li>${m}</li>`).join('')}</ul><div class="feedback-section"><strong>Use this sentence starter:</strong><br>“Using the ___ lens, I grouped ___ and ___ because they both ___. This matters because they may value ___.”</div>`;
+      segmentValidated=false;$('openTests').disabled=true;return;
     }
-
     const shared=sharedTraits(selected,lens);
     if(!shared.length){
+      const examples=validExamples(lens).slice(0,3);
       f.className='feedback watch show';
-      f.innerHTML=`<strong>The group needs a clearer connection.</strong><br>The selected customers do not share a specific ${formatLens(lens).toLowerCase()} characteristic. Try a different customer combination or choose another lens.`;
-      segmentValidated=false;
-      $('openTests').disabled=true;
-      return;
+      f.innerHTML=`<strong>Your form is complete, but this customer combination does not match under ${formatLens(lens)}.</strong><br>You selected <strong>${selected.map(c=>c.name).join(', ')}</strong>, but they do not share one coded ${formatLens(lens).toLowerCase()} trait.<div class="feedback-section"><strong>Try one of these valid groupings:</strong><ul class="feedback-list">${examples.map(([trait,cs])=>`<li><strong>${readableTraits([trait])[0]}:</strong> ${cs.map(c=>c.name).join(' + ')}</li>`).join('')}</ul>You may also keep your customers and change the lens if another type of similarity is more appropriate.</div>`;
+      segmentValidated=false;$('openTests').disabled=true;return;
     }
-
+    const readable=readableTraits(shared);
     f.className='feedback good show';
-    f.innerHTML=`<strong>Strong segment foundation.</strong><br>These customers share at least one ${formatLens(lens).toLowerCase()} characteristic: <strong>${shared.join(', ')}</strong>.`;
-    segmentValidated=true;
-    $('openTests').disabled=false;
+    f.innerHTML=`<strong>Yes—this is a defensible segment.</strong><br><strong>Your lens:</strong> ${formatLens(lens)}<br><strong>Your customers:</strong> ${selected.map(c=>c.name).join(', ')}<br><strong>The shared trait:</strong> ${readable.join(', ')}<div class="feedback-section"><strong>Why it works:</strong> You used one lens consistently and found a trait shared by every selected customer.<br><br><strong>Next:</strong> Test whether this useful customer group is measurable, substantial, accessible, differentiable, and actionable.</div>`;
+    segmentValidated=true;$('openTests').disabled=false;
   }
   function renderTests(){const selected=customers.filter(c=>selectedCustomers.has(c.id)),lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim();$('segmentRecap').innerHTML=`<strong>Segment:</strong> ${name}<br><strong>Lens:</strong> ${formatLens(lens)}<br><strong>Selected customers:</strong> ${selected.map(c=>c.name).join(', ')}<br><strong>Likely value:</strong> ${offer}<br><br>${logic}`;$('testGrid').innerHTML=tests.map(t=>`<article class="test-card" data-test="${t.id}"><div><h3>${t.label}</h3><p>${t.question}</p></div><div class="test-options"><button class="test-choice" data-test-value="yes">Yes</button><button class="test-choice" data-test-value="not-yet">Not yet</button></div></article>`).join('');document.querySelectorAll('[data-test-value]').forEach(b=>b.addEventListener('click',()=>{const card=b.closest('[data-test]');card.dataset.value=b.dataset.testValue;card.querySelectorAll('[data-test-value]').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('finish').disabled=true}))}
-  function evaluateTests(){const cards=[...document.querySelectorAll('[data-test]')],f=$('testFeedback');if(cards.some(c=>!c.dataset.value)){f.className='feedback risk show';f.innerHTML='<strong>Complete all five tests.</strong>';return}finalScore=cards.filter(c=>c.dataset.value==='yes').length;let heading,message;if(finalScore===5){heading='Strong, strategy-ready segment';message='The segment appears measurable, substantial, accessible, differentiable, and actionable.'}else if(finalScore>=3){heading='Promising segment that needs refinement';message='The customer group has potential, but one or more practical questions remain.'}else{heading='Interesting group, but not yet an effective segment';message='Similarity alone is not enough. A useful segment must help the company identify an opportunity and take action.'}f.className=`feedback show ${finalScore===5?'good':'watch'}`;f.innerHTML=`<strong>${heading}</strong><br>Your segment met <strong>${finalScore} of 5</strong> effectiveness tests.<br><br>${message}`;$('finish').disabled=false}
+  function evaluateTests(){
+    const cards=[...document.querySelectorAll('[data-test]')],f=$('testFeedback');
+    if(cards.some(c=>!c.dataset.value)){const unanswered=cards.filter(c=>!c.dataset.value).map(c=>c.querySelector('h3').textContent);f.className='feedback risk show';f.innerHTML=`<strong>One more step.</strong><br>Please answer: ${unanswered.join(', ')}.`;return}
+    finalScore=cards.filter(c=>c.dataset.value==='yes').length;
+    const yes=cards.filter(c=>c.dataset.value==='yes').map(c=>c.querySelector('h3').textContent);
+    const no=cards.filter(c=>c.dataset.value==='not-yet').map(c=>c.querySelector('h3').textContent);
+    const advice={Measurable:'Decide what count or market data would prove the size of this group.',Substantial:'Estimate whether the potential revenue or strategic value justifies a special approach.',Accessible:'Identify a practical list, channel, event, dealer, or communication method for reaching the group.',Differentiable:'Clarify the boundary: who is in, who is out, and why their response should differ.',Actionable:'Name one specific change in message, offer, service, pricing, or resource allocation.'};
+    let heading=finalScore===5?'Strong, strategy-ready segment':finalScore>=3?'Promising segment that needs refinement':'Useful practice group, but not yet an effective segment';
+    f.className=`feedback show ${finalScore===5?'good':'watch'}`;
+    f.innerHTML=`<strong>${heading}</strong><br>Your segment met <strong>${finalScore} of 5</strong> tests.${yes.length?`<div class="feedback-section"><strong>Tests met:</strong> ${yes.join(', ')}.</div>`:''}${no.length?`<div class="feedback-section"><strong>What to strengthen:</strong><ul class="feedback-list">${no.map(x=>`<li><strong>${x}:</strong> ${advice[x]}</li>`).join('')}</ul></div>`:'<div class="feedback-section"><strong>Excellent:</strong> The group is not only similar; it is practical enough to guide action. Your next decision is whether it deserves priority compared with other segments.</div>'}`;
+    $('finish').disabled=false;
+  }
   function renderCoaching(){const selected=customers.filter(c=>selectedCustomers.has(c.id)),lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim();$('coachingContent').innerHTML=`<div class="coach-grid"><article class="coach-card best"><h3>Your segment hypothesis</h3><p><strong>${name}</strong></p><p><strong>Method:</strong> ${formatLens(lens)}</p><p><strong>Customers:</strong> ${selected.map(c=>c.name).join(', ')}</p><p><strong>Likely value:</strong> ${offer}</p><p><strong>Your reasoning:</strong> ${logic}</p></article><article class="coach-card watch-card"><h3>Strategic coaching</h3><p><strong>Effectiveness score:</strong> ${finalScore} of 5 tests met</p><p>${finalScore===5?'Next, decide whether this segment should receive priority over other attractive segments.':'Investigate the tests not yet met before building a special program.'}</p><p>Segmentation guides resource allocation and program design; it does not replace individual discovery.</p></article></div><div class="summary-card" style="margin-top:22px"><strong>Textbook connection:</strong> Segments simplify a complicated marketplace so resources can be allocated and programs designed at scale. Salespeople then test those assumptions in the field.</div>`}
-  function reset(){answered=0;correct=0;selectedCustomers.clear();segmentValidated=false;finalScore=0;$('segmentLens').value='';$('segmentName').value='';$('segmentOffer').value='';$('segmentLogic').value='';$('quizSummary').className='feedback';$('builderFeedback').className='feedback';$('testFeedback').className='feedback';$('openBuilder').disabled=true;$('openTests').disabled=true;$('finish').disabled=true;renderScenarios();renderCustomers();showStep(0)}
+  function reset(){answered=0;correct=0;selectedCustomers.clear();segmentValidated=false;finalScore=0;$('segmentLens').value='';$('segmentName').value='';$('segmentOffer').value='';$('segmentLogic').value='';$('quizSummary').className='feedback';$('builderFeedback').className='feedback';$('testFeedback').className='feedback';$('openBuilder').disabled=true;$('openTests').disabled=true;$('finish').disabled=true;renderScenarios();renderCustomers();updateSelectionStatus();showStep(0)}
+  $('loadExample').addEventListener('click',()=>{
+    $('segmentLens').value='usage';selectedCustomers=new Set(['horizon','oakridge']);
+    document.querySelectorAll('[data-customer]').forEach(c=>{const on=selectedCustomers.has(c.dataset.customer);c.classList.toggle('selected',on);c.querySelector('.customer-state').textContent=on?'Selected':'Select customer'});
+    $('segmentName').value='Specialty-Crop Pest Management Customers';
+    $('segmentOffer').value='Practical pest-management support and reliable recommendations';
+    $('segmentLogic').value='Using the product usage lens, I grouped Horizon Specialty Crops and Oak Ridge Produce because both grow specialty crops and make frequent pest-management decisions. This matters because they may value practical pest-management support and reliable recommendations.';
+    $('lensHelper').textContent='Example loaded: both selected customers share specialty-crop and pest-management usage traits.';updateSelectionStatus();segmentValidated=false;$('openTests').disabled=true;$('builderFeedback').className='feedback';
+  });
   $('startPractice').addEventListener('click',()=>showStep(1));$('quizBack').addEventListener('click',()=>showStep(0));$('openBuilder').addEventListener('click',()=>showStep(2));$('builderBack').addEventListener('click',()=>showStep(1));$('checkBuild').addEventListener('click',checkSegment);$('openTests').addEventListener('click',()=>{if(segmentValidated){renderTests();showStep(3)}});$('testsBack').addEventListener('click',()=>showStep(2));$('evaluate').addEventListener('click',evaluateTests);$('finish').addEventListener('click',()=>{renderCoaching();showStep(4)});$('coachingBack').addEventListener('click',()=>showStep(3));$('complete').addEventListener('click',()=>showStep(5));$('restart').addEventListener('click',reset);$('print').addEventListener('click',()=>window.print());
   $('segmentLens').addEventListener('change',e=>{selectedCustomers.clear();segmentValidated=false;$('openTests').disabled=true;document.querySelectorAll('[data-customer]').forEach(c=>{c.classList.remove('selected');c.querySelector('.customer-state').textContent='Select customer'});const helper={demographic:'Look for shared observable characteristics such as acreage, herd size, scale, or age.',usage:'Look for shared crops, livestock, equipment, production systems, or recurring problems.',psychographic:'Look for shared buying behavior or beliefs about price, service, relationships, evidence, or innovation.'};$('lensHelper').textContent=helper[e.target.value]||'The lens determines which customer similarities should guide your selection.'});
   renderScenarios();renderCustomers();
