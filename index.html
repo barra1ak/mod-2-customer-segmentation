@@ -113,6 +113,8 @@
     .instruction-row span{display:grid;width:30px;height:30px;place-items:center;border-radius:50%;background:var(--black);color:var(--gold);font-weight:900;font-size:.82rem}
     .selection-status{margin-top:14px;border-radius:12px;background:#fff;padding:12px;border:1px solid var(--border);font-size:.88rem}
     .quick-example{width:100%;margin-top:10px;border:1px solid var(--gold-dark);border-radius:12px;background:var(--gold-light);padding:11px;color:#624918;font-weight:800;text-align:left}
+    .reset-example{display:none;width:100%;margin-top:8px;border:1px solid var(--border);border-radius:12px;background:#fff;padding:11px;color:var(--ink);font-weight:800;text-align:left}
+    .reset-example.show{display:block}
     .feedback-section{margin-top:12px;padding-top:12px;border-top:1px solid currentColor}
     .feedback-list{margin:8px 0 0;padding-left:20px}
     .mini-guide{margin-top:8px;color:var(--muted);font-size:.82rem}
@@ -198,6 +200,7 @@
         </div>
         <div id="selectionStatus" class="selection-status"><strong>Selected:</strong> 0 customers</div>
         <button id="loadExample" class="quick-example" type="button">Show me a valid example selection</button>
+        <button id="resetExample" class="reset-example" type="button">Reset example and start my own</button>
         <div class="callout"><strong>Remember:</strong> Customers do not belong together simply because they all work in agriculture.</div>
       </aside>
       <div id="customerGrid" class="customer-grid"></div>
@@ -323,14 +326,29 @@
     $('finish').disabled=false;
   }
   function renderCoaching(){const selected=customers.filter(c=>selectedCustomers.has(c.id)),lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim();$('coachingContent').innerHTML=`<div class="coach-grid"><article class="coach-card best"><h3>Your segment hypothesis</h3><p><strong>${name}</strong></p><p><strong>Method:</strong> ${formatLens(lens)}</p><p><strong>Customers:</strong> ${selected.map(c=>c.name).join(', ')}</p><p><strong>Likely value:</strong> ${offer}</p><p><strong>Your reasoning:</strong> ${logic}</p></article><article class="coach-card watch-card"><h3>Strategic coaching</h3><p><strong>Effectiveness score:</strong> ${finalScore} of 5 tests met</p><p>${finalScore===5?'Next, decide whether this segment should receive priority over other attractive segments.':'Investigate the tests not yet met before building a special program.'}</p><p>Segmentation guides resource allocation and program design; it does not replace individual discovery.</p></article></div><div class="summary-card" style="margin-top:22px"><strong>Textbook connection:</strong> Segments simplify a complicated marketplace so resources can be allocated and programs designed at scale. Salespeople then test those assumptions in the field.</div>`}
-  function reset(){answered=0;correct=0;selectedCustomers.clear();segmentValidated=false;finalScore=0;$('segmentLens').value='';$('segmentName').value='';$('segmentOffer').value='';$('segmentLogic').value='';$('quizSummary').className='feedback';$('builderFeedback').className='feedback';$('testFeedback').className='feedback';$('openBuilder').disabled=true;$('openTests').disabled=true;$('finish').disabled=true;renderScenarios();renderCustomers();updateSelectionStatus();showStep(0)}
+  function reset(){answered=0;correct=0;selectedCustomers.clear();segmentValidated=false;finalScore=0;$('segmentLens').value='';$('segmentName').value='';$('segmentOffer').value='';$('segmentLogic').value='';$('quizSummary').className='feedback';$('builderFeedback').className='feedback';$('testFeedback').className='feedback';$('openBuilder').disabled=true;$('openTests').disabled=true;$('finish').disabled=true;$('resetExample').classList.remove('show');renderScenarios();renderCustomers();updateSelectionStatus();showStep(0)}
   $('loadExample').addEventListener('click',()=>{
     $('segmentLens').value='usage';selectedCustomers=new Set(['horizon','oakridge']);
     document.querySelectorAll('[data-customer]').forEach(c=>{const on=selectedCustomers.has(c.dataset.customer);c.classList.toggle('selected',on);c.querySelector('.customer-state').textContent=on?'Selected':'Select customer'});
     $('segmentName').value='Specialty-Crop Pest Management Customers';
     $('segmentOffer').value='Practical pest-management support and reliable recommendations';
     $('segmentLogic').value='Using the product usage lens, I grouped Horizon Specialty Crops and Oak Ridge Produce because both grow specialty crops and make frequent pest-management decisions. This matters because they may value practical pest-management support and reliable recommendations.';
-    $('lensHelper').textContent='Example loaded: both selected customers share specialty-crop and pest-management usage traits.';updateSelectionStatus();segmentValidated=false;$('openTests').disabled=true;$('builderFeedback').className='feedback';
+    $('lensHelper').textContent='Example loaded: both selected customers share specialty-crop and pest-management usage traits.';updateSelectionStatus();segmentValidated=false;$('openTests').disabled=true;$('builderFeedback').className='feedback';$('resetExample').classList.add('show');
+  });
+  $('resetExample').addEventListener('click',()=>{
+    $('segmentLens').value='';
+    selectedCustomers.clear();
+    document.querySelectorAll('[data-customer]').forEach(c=>{c.classList.remove('selected');c.querySelector('.customer-state').textContent='Select customer'});
+    $('segmentName').value='';
+    $('segmentOffer').value='';
+    $('segmentLogic').value='';
+    $('lensHelper').textContent='The example has been cleared. Choose a lens and build your own segment.';
+    updateSelectionStatus();
+    segmentValidated=false;
+    $('openTests').disabled=true;
+    $('builderFeedback').className='feedback';
+    $('resetExample').classList.remove('show');
+    $('segmentLens').focus();
   });
   $('startPractice').addEventListener('click',()=>showStep(1));$('quizBack').addEventListener('click',()=>showStep(0));$('openBuilder').addEventListener('click',()=>showStep(2));$('builderBack').addEventListener('click',()=>showStep(1));$('checkBuild').addEventListener('click',checkSegment);$('openTests').addEventListener('click',()=>{if(segmentValidated){renderTests();showStep(3)}});$('testsBack').addEventListener('click',()=>showStep(2));$('evaluate').addEventListener('click',evaluateTests);$('finish').addEventListener('click',()=>{renderCoaching();showStep(4)});$('coachingBack').addEventListener('click',()=>showStep(3));$('complete').addEventListener('click',()=>showStep(5));$('restart').addEventListener('click',reset);$('print').addEventListener('click',()=>window.print());
   $('segmentLens').addEventListener('change',e=>{selectedCustomers.clear();segmentValidated=false;$('openTests').disabled=true;document.querySelectorAll('[data-customer]').forEach(c=>{c.classList.remove('selected');c.querySelector('.customer-state').textContent='Select customer'});const helper={demographic:'Look for shared observable characteristics such as acreage, herd size, scale, or age.',usage:'Look for shared crops, livestock, equipment, production systems, or recurring problems.',psychographic:'Look for shared buying behavior or beliefs about price, service, relationships, evidence, or innovation.'};$('lensHelper').textContent=helper[e.target.value]||'The lens determines which customer similarities should guide your selection.'});
