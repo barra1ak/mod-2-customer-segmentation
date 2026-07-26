@@ -128,7 +128,7 @@
   <section id="step1" class="panel active">
     <h2>Step 1: Learn the three segmentation lenses</h2>
     <p class="intro">A market segment is a group of customers who may respond similarly to an offer because they share important needs, goals, behaviors, or beliefs about what creates value.</p>
-    <div class="callout"><strong>Your assignment:</strong> Learn the three segmentation methods, practice recognizing them, build one customer segment, and test whether it is useful enough to guide action.</div>
+    <div class="callout"><strong>Your assignment:</strong> Learn the three textbook segmentation methods, practice recognizing them, build one customer segment, and test whether it is useful enough to guide action.</div>
     <div class="lens-grid">
       <article class="lens-card"><div class="lens-icon">DEM</div><h3>Demographics</h3><p>Observable characteristics such as operation size, age, income, education, acreage, or herd size.</p></article>
       <article class="lens-card"><div class="lens-icon">USE</div><h3>Product usage</h3><p>What customers grow, raise, use, manage, or experience in their operation.</p></article>
@@ -223,7 +223,43 @@
   function renderCustomers(){$('customerGrid').innerHTML=customers.map(c=>`<button class="customer-card" data-customer="${c.id}"><span class="customer-state">Select customer</span><h3>${c.name}</h3><ul>${c.facts.map(f=>`<li>${f}</li>`).join('')}</ul></button>`).join('');document.querySelectorAll('[data-customer]').forEach(card=>card.addEventListener('click',()=>{const lens=$('segmentLens').value;if(!lens){$('lensHelper').textContent='Choose a segmentation lens before selecting customer files.';return}const id=card.dataset.customer;if(selectedCustomers.has(id)){selectedCustomers.delete(id);card.classList.remove('selected');card.querySelector('.customer-state').textContent='Select customer'}else{selectedCustomers.add(id);card.classList.add('selected');card.querySelector('.customer-state').textContent='Selected'}segmentValidated=false;$('openTests').disabled=true}))}
   function sharedTraits(selected,lens){if(!selected.length)return[];return selected[0].traits[lens].filter(t=>selected.every(c=>c.traits[lens].includes(t)))}
   function formatLens(l){return l==='usage'?'Product usage':l.charAt(0).toUpperCase()+l.slice(1)}
-  function checkSegment(){const lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim(),f=$('builderFeedback'),selected=customers.filter(c=>selectedCustomers.has(c.id));if(!lens||selected.length<2||!name||!offer||logic.length<35){f.className='feedback risk show';f.innerHTML='<strong>Complete the segment definition.</strong><br>Choose a lens, select at least two customers, name the segment, describe what it may value, and explain the shared characteristic.';segmentValidated=false;$('openTests').disabled=true;return}const shared=sharedTraits(selected,lens);if(!shared.length){f.className='feedback watch show';f.innerHTML=`<strong>The group needs a clearer connection.</strong><br>The selected customers do not share a specific ${formatLens(lens).toLowerCase()} characteristic.`;segmentValidated=false;$('openTests').disabled=true;return}f.className='feedback good show';f.innerHTML=`<strong>Strong segment foundation.</strong><br>These customers share at least one ${formatLens(lens).toLowerCase()} characteristic: <strong>${shared.join(', ')}</strong>.`;segmentValidated=true;$('openTests').disabled=false}
+  function checkSegment(){
+    const lens=$('segmentLens').value;
+    const name=$('segmentName').value.trim();
+    const offer=$('segmentOffer').value.trim();
+    const logic=$('segmentLogic').value.trim();
+    const f=$('builderFeedback');
+    const selected=customers.filter(c=>selectedCustomers.has(c.id));
+    const missing=[];
+
+    if(!lens) missing.push('choose a segmentation lens');
+    if(selected.length<2) missing.push('select at least two customers');
+    if(!name) missing.push('name the segment');
+    if(!offer) missing.push('describe what the segment may value');
+    if(!logic) missing.push('explain the shared characteristic');
+
+    if(missing.length){
+      f.className='feedback risk show';
+      f.innerHTML=`<strong>Almost there.</strong><br>Please ${missing.join(', ')}.`;
+      segmentValidated=false;
+      $('openTests').disabled=true;
+      return;
+    }
+
+    const shared=sharedTraits(selected,lens);
+    if(!shared.length){
+      f.className='feedback watch show';
+      f.innerHTML=`<strong>The group needs a clearer connection.</strong><br>The selected customers do not share a specific ${formatLens(lens).toLowerCase()} characteristic. Try a different customer combination or choose another lens.`;
+      segmentValidated=false;
+      $('openTests').disabled=true;
+      return;
+    }
+
+    f.className='feedback good show';
+    f.innerHTML=`<strong>Strong segment foundation.</strong><br>These customers share at least one ${formatLens(lens).toLowerCase()} characteristic: <strong>${shared.join(', ')}</strong>.`;
+    segmentValidated=true;
+    $('openTests').disabled=false;
+  }
   function renderTests(){const selected=customers.filter(c=>selectedCustomers.has(c.id)),lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim();$('segmentRecap').innerHTML=`<strong>Segment:</strong> ${name}<br><strong>Lens:</strong> ${formatLens(lens)}<br><strong>Selected customers:</strong> ${selected.map(c=>c.name).join(', ')}<br><strong>Likely value:</strong> ${offer}<br><br>${logic}`;$('testGrid').innerHTML=tests.map(t=>`<article class="test-card" data-test="${t.id}"><div><h3>${t.label}</h3><p>${t.question}</p></div><div class="test-options"><button class="test-choice" data-test-value="yes">Yes</button><button class="test-choice" data-test-value="not-yet">Not yet</button></div></article>`).join('');document.querySelectorAll('[data-test-value]').forEach(b=>b.addEventListener('click',()=>{const card=b.closest('[data-test]');card.dataset.value=b.dataset.testValue;card.querySelectorAll('[data-test-value]').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('finish').disabled=true}))}
   function evaluateTests(){const cards=[...document.querySelectorAll('[data-test]')],f=$('testFeedback');if(cards.some(c=>!c.dataset.value)){f.className='feedback risk show';f.innerHTML='<strong>Complete all five tests.</strong>';return}finalScore=cards.filter(c=>c.dataset.value==='yes').length;let heading,message;if(finalScore===5){heading='Strong, strategy-ready segment';message='The segment appears measurable, substantial, accessible, differentiable, and actionable.'}else if(finalScore>=3){heading='Promising segment that needs refinement';message='The customer group has potential, but one or more practical questions remain.'}else{heading='Interesting group, but not yet an effective segment';message='Similarity alone is not enough. A useful segment must help the company identify an opportunity and take action.'}f.className=`feedback show ${finalScore===5?'good':'watch'}`;f.innerHTML=`<strong>${heading}</strong><br>Your segment met <strong>${finalScore} of 5</strong> effectiveness tests.<br><br>${message}`;$('finish').disabled=false}
   function renderCoaching(){const selected=customers.filter(c=>selectedCustomers.has(c.id)),lens=$('segmentLens').value,name=$('segmentName').value.trim(),offer=$('segmentOffer').value.trim(),logic=$('segmentLogic').value.trim();$('coachingContent').innerHTML=`<div class="coach-grid"><article class="coach-card best"><h3>Your segment hypothesis</h3><p><strong>${name}</strong></p><p><strong>Method:</strong> ${formatLens(lens)}</p><p><strong>Customers:</strong> ${selected.map(c=>c.name).join(', ')}</p><p><strong>Likely value:</strong> ${offer}</p><p><strong>Your reasoning:</strong> ${logic}</p></article><article class="coach-card watch-card"><h3>Strategic coaching</h3><p><strong>Effectiveness score:</strong> ${finalScore} of 5 tests met</p><p>${finalScore===5?'Next, decide whether this segment should receive priority over other attractive segments.':'Investigate the tests not yet met before building a special program.'}</p><p>Segmentation guides resource allocation and program design; it does not replace individual discovery.</p></article></div><div class="summary-card" style="margin-top:22px"><strong>Textbook connection:</strong> Segments simplify a complicated marketplace so resources can be allocated and programs designed at scale. Salespeople then test those assumptions in the field.</div>`}
