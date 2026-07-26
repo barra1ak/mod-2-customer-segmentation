@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Purdue-themed agricultural territory analysis activity.">
+  <title>Territory Intelligence Lab</title>
+
+  <style>
+    :root {
+      --black:#000;
+      --gold:#cfb991;
+      --gold-dark:#8e6f3e;
+      --gold-light:#f5eddf;
+      --white:#fff;
+      --ink:#181818;
+      --muted:#626262;
+      --canvas:#f5f4f0;
+      --border:#d8d5ce;
+      --green:#28724f;
+      --green-soft:#eaf6ef;
+      --amber:#936100;
+      --amber-soft:#fff6dc;
+      --red:#a23a37;
+      --red-soft:#fff0ef;
+      --blue:#315d73;
+      --blue-soft:#edf5f8;
+      --shadow:0 16px 42px rgba(0,0,0,.09);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:12px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at top right, rgba(207,185,145,.26), transparent 32rem),
+        linear-gradient(180deg,#faf9f6 0%,#f1f0ec 100%);
+      color:var(--ink);
+      font-family:Arial,Helvetica,sans-serif;
+      line-height:1.55;
+    }
+
+    button,select,textarea,input{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{
+      outline:4px solid rgba(142,111,62,.25);
+      outline-offset:3px;
+    }
+
+    .shell{width:min(1180px,calc(100% - 30px));margin:24px auto 34px}
+
+    .hero{
+      overflow:hidden;
+      border-radius:var(--radius-xl);
+      background:var(--black);
+      color:var(--white);
+      box-shadow:var(--shadow);
+    }
+    .hero-line{height:8px;background:var(--gold)}
+    .hero-inner{padding:clamp(30px,5vw,58px)}
+    .hero-main{max-width:900px}
+    .eyebrow{
+      display:inline-flex;
+      margin-bottom:15px;
+      border:1px solid rgba(207,185,145,.65);
+      border-radius:999px;
+      padding:7px 12px;
+      color:var(--gold);
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    h1,h2,h3,p{margin-top:0}
+    h1{
+      margin-bottom:16px;
+      font-size:clamp(2.2rem,5vw,4.35rem);
+      line-height:1.02;
+      letter-spacing:-.045em;
+    }
+    h2{margin-bottom:8px;font-size:clamp(1.5rem,3vw,2.15rem);line-height:1.15}
+    h3{margin-bottom:7px;font-size:1.05rem}
+    .hero-copy{max-width:820px;margin-bottom:0;color:#e7e7e7;font-size:1.05rem}
+    .objective{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:15px;
+      align-items:start;
+      max-width:940px;
+      margin-top:28px;
+      border:1px solid rgba(207,185,145,.5);
+      border-radius:var(--radius-lg);
+      background:rgba(207,185,145,.12);
+      padding:18px 20px;
+    }
+    .objective-mark{
+      display:grid;
+      width:42px;
+      height:42px;
+      place-items:center;
+      border-radius:50%;
+      background:var(--gold);
+      color:var(--black);
+      font-weight:900;
+    }
+    .objective-label{
+      margin-bottom:5px;
+      color:var(--gold);
+      font-size:.73rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .objective p{margin:0;font-weight:700}
+
+    .progress{
+      margin:20px 0;
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      background:var(--white);
+      padding:17px 20px;
+    }
+    .progress-head{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:10px;
+      font-size:.9rem;
+      font-weight:800;
+    }
+    .progress-track{overflow:hidden;height:10px;border-radius:999px;background:#e8e5df}
+    .progress-bar{
+      width:25%;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,var(--gold-dark),var(--gold));
+      transition:width .25s ease;
+    }
+
+    .panel{
+      display:none;
+      border:1px solid var(--border);
+      border-top:6px solid var(--gold-dark);
+      border-radius:var(--radius-xl);
+      background:var(--white);
+      padding:clamp(22px,4vw,42px);
+      box-shadow:var(--shadow);
+    }
+    .panel.active{display:block;animation:rise .22s ease}
+    @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .intro{max-width:860px;margin-bottom:22px;color:var(--muted)}
+    .callout{
+      margin:20px 0;
+      border-left:6px solid var(--gold-dark);
+      border-radius:0 var(--radius-md) var(--radius-md) 0;
+      background:var(--gold-light);
+      padding:18px;
+    }
+
+    .lens-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:13px;
+      margin-top:22px;
+    }
+    .lens-card{
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      background:#fff;
+      padding:17px;
+    }
+    .lens-icon{
+      display:grid;
+      width:36px;
+      height:36px;
+      place-items:center;
+      margin-bottom:10px;
+      border-radius:50%;
+      background:var(--black);
+      color:var(--gold);
+      font-size:.75rem;
+      font-weight:900;
+    }
+    .lens-card p{margin-bottom:0;color:var(--muted);font-size:.9rem}
+
+    .buttons{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}
+    .btn{
+      border:0;
+      border-radius:13px;
+      padding:12px 18px;
+      font-weight:800;
+      transition:transform .15s ease,background .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--black);color:var(--white)}
+    .btn-primary:hover{background:#292929}
+    .btn-gold{background:var(--gold-dark);color:var(--white)}
+    .btn-secondary{border:1px solid var(--border);background:var(--white);color:var(--ink)}
+    .btn:disabled{cursor:not-allowed;opacity:.45;transform:none}
+
+    .territory-shell{
+      display:grid;
+      grid-template-columns:.8fr 1.2fr;
+      gap:20px;
+      align-items:start;
+    }
+    .map-card{
+      border:1px solid var(--border);
+      border-radius:var(--radius-xl);
+      background:#f6f4ef;
+      padding:18px;
+    }
+    .map-title{margin-bottom:12px;font-weight:800}
+    .territory-map{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      aspect-ratio:1/1;
+    }
+    .zone{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:110px;
+      border:2px solid var(--border);
+      border-radius:16px;
+      background:#fff;
+      padding:12px;
+      text-align:center;
+      transition:border-color .15s ease,background .15s ease,transform .15s ease;
+    }
+    .zone:hover{border-color:var(--gold-dark);transform:translateY(-1px)}
+    .zone.active{border-color:var(--gold-dark);background:var(--gold-light)}
+    .zone strong{display:block}
+    .zone small{display:block;margin-top:4px;color:var(--muted)}
+    .zone.north{grid-column:1/3}
+    .zone.east{grid-column:3;grid-row:1/3}
+    .zone.central{grid-column:1/3}
+    .zone.south{grid-column:1}
+    .zone.river{grid-column:2/4}
+
+    .zone-detail{
+      border:1px solid var(--border);
+      border-radius:var(--radius-xl);
+      overflow:hidden;
+    }
+    .zone-header{padding:22px;background:var(--black);color:var(--white)}
+    .zone-kicker{
+      margin-bottom:6px;
+      color:var(--gold);
+      font-size:.73rem;
+      font-weight:800;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+    }
+    .zone-header h3{margin-bottom:5px;font-size:1.55rem}
+    .zone-header p{margin-bottom:0;color:#e5e5e5}
+    .zone-body{padding:22px}
+    .zone-facts{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+    .fact{border-radius:12px;background:#f3f2ee;padding:12px}
+    .fact-label{
+      margin-bottom:4px;
+      color:var(--muted);
+      font-size:.7rem;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    .fact-value{font-weight:800}
+    .evidence-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+    .evidence-card{
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:15px;
+    }
+    .evidence-card p{margin-bottom:0;color:var(--muted);font-size:.9rem}
+    .evidence-tag{
+      display:inline-block;
+      margin-bottom:7px;
+      border-radius:999px;
+      padding:5px 9px;
+      background:var(--gold-light);
+      color:#624918;
+      font-size:.72rem;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .signal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .signal{border-radius:999px;padding:7px 10px;font-size:.78rem;font-weight:800}
+    .positive{background:var(--green-soft);color:var(--green)}
+    .watch{background:var(--amber-soft);color:var(--amber)}
+    .risk{background:var(--red-soft);color:var(--red)}
+
+    .evidence-board{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      margin-top:22px;
+    }
+    .board-card{
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:17px;
+    }
+    .board-card label{display:block;margin-bottom:8px;font-weight:800}
+    select,textarea{
+      width:100%;
+      border:1px solid #bdb8ae;
+      border-radius:12px;
+      background:#fff;
+      padding:12px;
+    }
+    textarea{min-height:95px;resize:vertical}
+    .matrix-wrap{overflow-x:auto;margin-top:20px}
+    .matrix{
+      width:100%;
+      min-width:840px;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      overflow:hidden;
+    }
+    .matrix th,.matrix td{
+      border-right:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      padding:12px;
+      text-align:center;
+    }
+    .matrix th:last-child,.matrix td:last-child{border-right:0}
+    .matrix tr:last-child td{border-bottom:0}
+    .matrix thead th{background:var(--black);color:var(--white);font-size:.8rem}
+    .matrix tbody th{background:#f3f2ee;text-align:left}
+    .cell-high{background:#dff1e6;color:var(--green);font-weight:900}
+    .cell-mid{background:#fff0c2;color:#7b5500;font-weight:900}
+    .cell-low{background:#fbe0de;color:var(--red);font-weight:900}
+
+    .priority-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+      margin-top:22px;
+    }
+    .priority-card{
+      border:2px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:18px;
+      background:#fff;
+    }
+    .priority-card.selected{border-color:var(--gold-dark);background:var(--gold-light)}
+    .priority-card button{
+      width:100%;
+      border:0;
+      background:transparent;
+      color:inherit;
+      text-align:left;
+      padding:0;
+    }
+    .priority-score{
+      display:inline-grid;
+      min-width:42px;
+      height:42px;
+      place-items:center;
+      margin-bottom:10px;
+      border-radius:50%;
+      background:var(--black);
+      color:var(--gold);
+      font-weight:900;
+    }
+    .priority-card p{margin-bottom:0;color:var(--muted);font-size:.9rem}
+
+    .hypothesis-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      margin-top:20px;
+    }
+    .hypothesis{
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:17px;
+    }
+    .hypothesis label{display:block;margin-bottom:8px;font-weight:800}
+
+    .feedback{
+      display:none;
+      margin-top:18px;
+      border-radius:var(--radius-lg);
+      padding:18px;
+    }
+    .feedback.show{display:block}
+    .feedback.good{background:var(--green-soft);color:var(--green);border:1px solid #bdddc9}
+    .feedback.watch{background:var(--amber-soft);color:var(--amber);border:1px solid #ead596}
+    .feedback.risk{background:var(--red-soft);color:var(--red);border:1px solid #ecc4c2}
+
+    .coach-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:15px;
+      margin-top:22px;
+    }
+    .coach-card{
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:18px;
+    }
+    .coach-card.best{border-top:6px solid var(--green);background:var(--green-soft)}
+    .coach-card.watch-card{border-top:6px solid var(--amber);background:var(--amber-soft)}
+    .strategy-summary{
+      margin-top:22px;
+      border-radius:var(--radius-lg);
+      background:var(--black);
+      color:var(--white);
+      padding:22px;
+    }
+    .strategy-summary strong{color:var(--gold)}
+    .completion{
+      display:grid;
+      min-height:390px;
+      place-items:center;
+      text-align:center;
+    }
+    .completion-mark{
+      display:grid;
+      width:82px;
+      height:82px;
+      place-items:center;
+      margin:0 auto 18px;
+      border-radius:50%;
+      background:var(--gold);
+      color:var(--black);
+      font-size:2.2rem;
+      font-weight:900;
+    }
+    .completion p{max-width:700px;color:var(--muted)}
+    .footer{padding:20px 0 2px;color:var(--muted);text-align:center;font-size:.82rem}
+
+    @media(max-width:1024px){
+      .hero-inner{padding:44px 38px}
+      .lens-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .territory-shell{grid-template-columns:1fr}
+      .priority-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:820px){
+      .hero-inner{padding:38px 30px}
+      .zone-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .evidence-grid,.evidence-board,.hypothesis-grid,.coach-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+      .shell{width:min(100% - 16px,1180px);margin:8px auto 22px}
+      .hero{border-radius:17px}
+      .hero-line{height:6px}
+      .hero-inner{padding:27px 20px 24px}
+      .eyebrow{max-width:100%;white-space:normal;font-size:.68rem;line-height:1.35}
+      h1{font-size:clamp(2rem,11vw,2.8rem);overflow-wrap:anywhere}
+      .hero-copy{font-size:.96rem}
+      .objective{grid-template-columns:auto 1fr;gap:11px;margin-top:20px;padding:15px}
+      .objective-mark{width:36px;height:36px}
+      .progress{margin:14px 0;padding:14px 15px}
+      .progress-head{flex-direction:column;gap:3px}
+      .panel{border-radius:18px;padding:22px 17px}
+      .lens-grid,.zone-facts,.priority-grid{grid-template-columns:1fr}
+      .territory-map{grid-template-columns:1fr;aspect-ratio:auto}
+      .zone,.zone.north,.zone.east,.zone.central,.zone.south,.zone.river{grid-column:auto;grid-row:auto}
+      .buttons{flex-direction:column}
+      .btn{width:100%}
+    }
+    @media(max-width:390px){
+      .hero-inner{padding-left:17px;padding-right:17px}
+      h1{font-size:2rem}
+      .objective{grid-template-columns:1fr}
+    }
+    @media print{
+      body{background:#fff}
+      .shell{width:100%;margin:0}
+      .hero,.panel,.progress{box-shadow:none}
+      .buttons,.progress{display:none!important}
+      .panel{display:block!important;page-break-after:always}
+      .matrix-wrap{overflow:visible}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="hero-line"></div>
+      <div class="hero-inner">
+        <div class="hero-main">
+          <div class="eyebrow">Purdue Territory Strategy Activity</div>
+          <h1>Territory Intelligence Lab</h1>
+          <p class="hero-copy">
+            Investigate a fictional agricultural territory, connect scattered market signals,
+            and decide where a commercial team should focus its time, relationships, and resources.
+          </p>
+        </div>
+
+        <aside class="objective" aria-label="Learning objective">
+          <div class="objective-mark" aria-hidden="true">✓</div>
+          <div>
+            <div class="objective-label">Learning objective</div>
+            <p>Analyze territory using market, customer, competitor, and environmental information.</p>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <section class="progress" aria-label="Activity progress">
+      <div class="progress-head">
+        <span id="progressText">Step 1 of 4</span>
+        <span id="progressTitle">Learn the territory lenses</span>
+      </div>
+      <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+    </section>
+
+    <section id="step1" class="panel active">
+      <h2>Step 1: Use seven territory lenses</h2>
+      <p class="intro">
+        A territory is more than a list of accounts. Strong analysis connects the physical
+        market, production realities, customer structure, competitors, trends, and outside forces.
+      </p>
+
+      <div class="callout">
+        <strong>Your assignment:</strong> Investigate the fictional Heartland East territory.
+        Review each zone, classify the evidence, build a priority map, and recommend a territory strategy.
+      </div>
+
+      <div class="lens-grid">
+        <article class="lens-card"><div class="lens-icon">GEO</div><h3>Geography</h3><p>Distance, transportation, terrain, service coverage, and physical market boundaries.</p></article>
+        <article class="lens-card"><div class="lens-icon">PS</div><h3>Production systems</h3><p>Crop and livestock systems, operating scale, seasonality, and production practices.</p></article>
+        <article class="lens-card"><div class="lens-icon">TR</div><h3>Trends</h3><p>Demand shifts, consolidation, labor pressure, margin changes, and emerging needs.</p></article>
+        <article class="lens-card"><div class="lens-icon">REG</div><h3>Regulation</h3><p>Rules, incentives, reporting requirements, and compliance pressures.</p></article>
+        <article class="lens-card"><div class="lens-icon">TECH</div><h3>Technology</h3><p>Adoption levels, infrastructure, interoperability, and technical readiness.</p></article>
+        <article class="lens-card"><div class="lens-icon">COMP</div><h3>Competition</h3><p>Competitor strength, channel access, local loyalty, price pressure, and white space.</p></article>
+        <article class="lens-card"><div class="lens-icon">CC</div><h3>Customer concentration</h3><p>Whether opportunity is spread across many accounts or concentrated in a few powerful customers.</p></article>
+      </div>
+
+      <div class="buttons">
+        <button id="openTerritory" class="btn btn-primary" type="button">Open the territory briefing</button>
+      </div>
+    </section>
+
+    <section id="step2" class="panel">
+      <h2>Step 2: Investigate the territory zones</h2>
+      <p class="intro">
+        Select each zone on the map. Review the evidence, classify the zone’s dominant
+        opportunity type, and explain which territory signals shaped your conclusion.
+      </p>
+
+      <div class="territory-shell">
+        <div class="map-card">
+          <div class="map-title">Heartland East territory</div>
+          <div id="territoryMap" class="territory-map"></div>
+          <div class="callout">
+            <strong>Tip:</strong> High market size does not always mean high priority. Look for the
+            combination of customer need, competitive openness, readiness, and practical coverage.
+          </div>
+        </div>
+
+        <div id="zoneDetail" class="zone-detail"></div>
+      </div>
+
+      <div class="buttons">
+        <button id="territoryBack" class="btn btn-secondary" type="button">Back</button>
+        <button id="buildMatrix" class="btn btn-primary" type="button" disabled>Build the territory matrix</button>
+      </div>
+    </section>
+
+    <section id="step3" class="panel">
+      <h2>Step 3: Build the territory priority map</h2>
+      <p class="intro">
+        Your matrix summarizes what you learned. Now choose one primary zone and one secondary
+        zone, then test a territory hypothesis.
+      </p>
+
+      <div id="matrixContainer"></div>
+      <div id="priorityGrid" class="priority-grid"></div>
+
+      <div class="hypothesis-grid">
+        <article class="hypothesis">
+          <label for="primaryReason">Why should the primary zone receive focus?</label>
+          <textarea id="primaryReason" placeholder="Use evidence from at least three territory lenses."></textarea>
+        </article>
+        <article class="hypothesis">
+          <label for="nextQuestion">What must the team learn next?</label>
+          <textarea id="nextQuestion" placeholder="Identify the most important uncertainty or missing evidence."></textarea>
+        </article>
+      </div>
+
+      <div class="buttons">
+        <button id="matrixBack" class="btn btn-secondary" type="button">Back to investigation</button>
+        <button id="analyzeStrategy" class="btn btn-gold" type="button">Analyze my territory strategy</button>
+      </div>
+
+      <div id="strategyFeedback" class="feedback" aria-live="polite"></div>
+
+      <div class="buttons">
+        <button id="coachingNext" class="btn btn-primary" type="button" disabled>Review coaching feedback</button>
+      </div>
+    </section>
+
+    <section id="step4" class="panel">
+      <h2>Step 4: Review the territory coaching</h2>
+      <p class="intro">
+        Territory strategy is a hypothesis, not a permanent answer. Good analysis makes the
+        reasoning explicit and identifies what should be monitored next.
+      </p>
+
+      <div id="coachingContainer"></div>
+
+      <div class="buttons">
+        <button id="coachingBack" class="btn btn-secondary" type="button">Back to strategy</button>
+        <button id="finish" class="btn btn-primary" type="button">Complete activity</button>
+      </div>
+    </section>
+
+    <section id="completion" class="panel">
+      <div class="completion">
+        <div>
+          <div class="completion-mark">✓</div>
+          <h2>Territory analysis complete</h2>
+          <p>
+            You connected geography, production systems, trends, regulation, technology,
+            competition, and customer concentration to create a focused territory strategy.
+          </p>
+          <div class="buttons" style="justify-content:center;">
+            <button id="restart" class="btn btn-primary" type="button">Restart activity</button>
+            <button id="print" class="btn btn-secondary" type="button">Print or save as PDF</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">Designed as a guided Purdue agricultural territory-analysis activity.</div>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const lenses = ["Geography","Production","Trends","Regulation","Technology","Competition","Customer concentration"];
+
+      const zones = [
+        {
+          id:"north",
+          name:"North Ridge",
+          subtitle:"Large row-crop corridor",
+          profile:"A high-acreage corn and soybean region with strong farm scale, mature dealer networks, and rapid technology adoption.",
+          facts:{customers:"82 priority accounts",production:"Corn and soybeans",travel:"Efficient highway access"},
+          evidence:[
+            ["Geography","Dense serviceable corridor with short travel time between large accounts."],
+            ["Production","Large-scale row-crop systems with high equipment utilization."],
+            ["Trends","Consolidation is increasing average account size and professional management."],
+            ["Regulation","Nutrient reporting requirements are becoming more important."],
+            ["Technology","High adoption of precision systems, but integration complaints are common."],
+            ["Competition","Two established competitors have strong dealer relationships."],
+            ["Customer concentration","Top 15 accounts represent 48% of potential territory revenue."]
+          ],
+          signals:[["Large reachable accounts","positive"],["Strong incumbents","risk"],["Integration pain","watch"]],
+          benchmark:{Geography:5,Production:5,Trends:4,Regulation:3,Technology:5,Competition:2,"Customer concentration":4},
+          bestType:"Defend and differentiate",
+          coaching:"North Ridge is valuable and efficient to cover, but competition is entrenched. Success depends on differentiation, integration support, and focused account plans—not broad awareness activity."
+        },
+        {
+          id:"east",
+          name:"Eastern Dairy Belt",
+          subtitle:"Dairy and forage systems",
+          profile:"A specialized dairy region with concentrated herds, labor constraints, and rising interest in automation and monitoring.",
+          facts:{customers:"34 major operations",production:"Dairy and forage",travel:"Moderate route density"},
+          evidence:[
+            ["Geography","Operations are clustered around processing and feed infrastructure."],
+            ["Production","Large dairies depend on continuous workflows and reliable support."],
+            ["Trends","Labor scarcity and herd consolidation are accelerating automation interest."],
+            ["Regulation","Environmental reporting and manure-management rules are tightening."],
+            ["Technology","Adoption is uneven; leading operations are sophisticated, others remain cautious."],
+            ["Competition","One dominant specialist competitor has strong service credibility."],
+            ["Customer concentration","Ten operations represent more than half of market potential."]
+          ],
+          signals:[["Urgent labor pressure","positive"],["Specialist competitor","risk"],["Concentrated opportunity","watch"]],
+          benchmark:{Geography:4,Production:5,Trends:5,Regulation:4,Technology:4,Competition:2,"Customer concentration":5},
+          bestType:"Focused vertical play",
+          coaching:"The Eastern Dairy Belt offers a focused vertical opportunity. A small number of large operations can create meaningful value, but technical credibility and service response are essential."
+        },
+        {
+          id:"central",
+          name:"Central Mixed Market",
+          subtitle:"Diverse farms and retailers",
+          profile:"A mixed agricultural market containing row crops, specialty crops, small livestock operations, and several independent retailers.",
+          facts:{customers:"146 mixed accounts",production:"Highly diverse",travel:"Dense but fragmented"},
+          evidence:[
+            ["Geography","Short distances, but account needs vary sharply from one community to another."],
+            ["Production","Multiple production systems make standard messaging difficult."],
+            ["Trends","Independent retailers are seeking ways to differentiate beyond price."],
+            ["Regulation","No single regulatory pressure dominates the zone."],
+            ["Technology","Moderate adoption with strong demand for simple, practical solutions."],
+            ["Competition","Competitive field is fragmented; no supplier dominates every segment."],
+            ["Customer concentration","Revenue is spread across many medium and small accounts."]
+          ],
+          signals:[["Competitive white space","positive"],["Fragmented needs","watch"],["High coverage burden","risk"]],
+          benchmark:{Geography:4,Production:3,Trends:4,Regulation:2,Technology:3,Competition:4,"Customer concentration":2},
+          bestType:"Segment selectively",
+          coaching:"Central Mixed Market contains white space but can consume time. The right strategy is segmentation: choose a few production systems or retailer partners rather than treating the zone as one market."
+        },
+        {
+          id:"south",
+          name:"Southern Specialty Cluster",
+          subtitle:"Produce, seed, and high-value crops",
+          profile:"A smaller but fast-changing cluster of specialty growers, seed producers, packers, and contract production businesses.",
+          facts:{customers:"41 high-value accounts",production:"Specialty and seed",travel:"Longer travel loops"},
+          evidence:[
+            ["Geography","Accounts are spread across a wider area, increasing service and travel cost."],
+            ["Production","High-value crops create strong sensitivity to quality, traceability, and loss prevention."],
+            ["Trends","Downstream buyers are raising documentation and sustainability expectations."],
+            ["Regulation","Food-safety and traceability requirements are increasingly visible."],
+            ["Technology","Customers are actively evaluating digital tracking and automation."],
+            ["Competition","Few competitors offer integrated solutions tailored to specialty systems."],
+            ["Customer concentration","Several large packers influence many smaller growers."]
+          ],
+          signals:[["Clear unmet need","positive"],["Low direct competition","positive"],["Travel burden","watch"]],
+          benchmark:{Geography:2,Production:4,Trends:5,Regulation:5,Technology:4,Competition:5,"Customer concentration":4},
+          bestType:"Invest and build",
+          coaching:"Southern Specialty Cluster is the strongest growth hypothesis. Regulation, downstream expectations, technology interest, and limited competition create an opening. The main constraint is coverage cost."
+        },
+        {
+          id:"river",
+          name:"River Plains",
+          subtitle:"Broad-acre and livestock transition zone",
+          profile:"A broad rural zone with large acreage, aging ownership, uneven broadband, and growing succession uncertainty.",
+          facts:{customers:"103 accounts",production:"Grain and livestock",travel:"High travel burden"},
+          evidence:[
+            ["Geography","Large distances and limited service density reduce efficient coverage."],
+            ["Production","Traditional systems remain common, with gradual movement toward larger operations."],
+            ["Trends","Succession and consolidation may reshape the market over five years."],
+            ["Regulation","Current regulatory pressure is moderate."],
+            ["Technology","Broadband limitations and cautious adoption reduce near-term readiness."],
+            ["Competition","Local relationships are strong, though competitors invest little in innovation."],
+            ["Customer concentration","Opportunity is widely dispersed with few anchor accounts."]
+          ],
+          signals:[["Long-term change","watch"],["Low readiness","risk"],["Limited competitor innovation","positive"]],
+          benchmark:{Geography:2,Production:3,Trends:3,Regulation:2,Technology:2,Competition:3,"Customer concentration":2},
+          bestType:"Monitor and maintain",
+          coaching:"River Plains should not absorb disproportionate near-term resources. Maintain key relationships, monitor succession and infrastructure changes, and pursue only clearly qualified opportunities."
+        }
+      ];
+
+      const zoneGuidance = {
+        north: {
+          drivers: ["Technology", "Competition", "Customer concentration"],
+          risks: ["Competitive strength", "Implementation burden"],
+          actions: ["Key accounts", "Pilot"],
+          explanation: "North Ridge is commercially attractive, but its strongest signals are mature technology use, concentrated account value, and entrenched competitors. The best response is focused differentiation through key-account plans or pilots."
+        },
+        east: {
+          drivers: ["Trends", "Production", "Customer concentration"],
+          risks: ["Competitive strength", "Implementation burden"],
+          actions: ["Key accounts", "Partner", "Pilot"],
+          explanation: "The Eastern Dairy Belt is shaped by labor pressure, specialized production needs, and a concentrated customer base. Success depends on technical credibility, service readiness, and a focused vertical approach."
+        },
+        central: {
+          drivers: ["Competition", "Geography", "Production"],
+          risks: ["Fragmented demand", "Coverage cost"],
+          actions: ["Segment", "Discovery"],
+          explanation: "Central Mixed Market contains opportunity, but its diversity makes broad execution inefficient. The strongest move is to segment by production system, retailer type, or customer need before allocating major resources."
+        },
+        south: {
+          drivers: ["Trends", "Regulation", "Competition", "Technology"],
+          risks: ["Coverage cost", "Implementation burden"],
+          actions: ["Pilot", "Partner", "Key accounts"],
+          explanation: "Southern Specialty Cluster combines unmet need, regulatory pressure, technology interest, and limited direct competition. It is the clearest growth zone, provided travel and support costs are managed deliberately."
+        },
+        river: {
+          drivers: ["Trends", "Technology", "Geography"],
+          risks: ["Low readiness", "Coverage cost", "Unclear timing"],
+          actions: ["Monitor", "Discovery"],
+          explanation: "River Plains has long-term change potential, but weak readiness, dispersed accounts, and high travel costs reduce near-term attractiveness. The appropriate posture is selective discovery and relationship maintenance."
+        }
+      };
+
+      const analysis = {};
+      zones.forEach(z => {
+        analysis[z.id] = {type:"",driver:"",risk:"",action:"",note:""};
+      });
+
+      let currentStep = 0;
+      let activeZone = 0;
+      let primaryZone = "";
+      let secondaryZone = "";
+      const reviewed = new Set();
+
+      const stepIds=["step1","step2","step3","step4","completion"];
+      const stepTitles=["Learn the territory lenses","Investigate the territory zones","Build the priority map","Review coaching feedback"];
+
+      function showStep(index){
+        currentStep=Math.max(0,Math.min(index,4));
+        stepIds.forEach((id,i)=>document.getElementById(id).classList.toggle("active",i===currentStep));
+        const pText=document.getElementById("progressText");
+        const pTitle=document.getElementById("progressTitle");
+        const pBar=document.getElementById("progressBar");
+        if(currentStep<4){
+          pText.textContent=`Step ${currentStep+1} of 4`;
+          pTitle.textContent=stepTitles[currentStep];
+          pBar.style.width=`${(currentStep+1)*25}%`;
+        }else{
+          pText.textContent="Complete";
+          pTitle.textContent="Territory analysis finished";
+          pBar.style.width="100%";
+        }
+        window.scrollTo({top:0,behavior:"smooth"});
+      }
+
+      function renderMap(){
+        const map=document.getElementById("territoryMap");
+        map.innerHTML=zones.map((z,i)=>`
+          <button type="button" class="zone ${z.id} ${i===activeZone?"active":""}" data-zone-index="${i}">
+            <strong>${z.name}</strong>
+            <small>${z.subtitle}</small>
+          </button>
+        `).join("");
+
+        map.querySelectorAll("[data-zone-index]").forEach(btn=>{
+          btn.addEventListener("click",()=>{
+            activeZone=Number(btn.dataset.zoneIndex);
+            renderMap();
+            renderZone();
+          });
+        });
+      }
+
+      function renderZone(){
+        const z=zones[activeZone];
+        const saved=analysis[z.id];
+        const detail=document.getElementById("zoneDetail");
+
+        detail.innerHTML=`
+          <header class="zone-header">
+            <div class="zone-kicker">Territory zone ${activeZone+1} of ${zones.length}</div>
+            <h3>${z.name}</h3>
+            <p>${z.profile}</p>
+          </header>
+          <div class="zone-body">
+            <div class="zone-facts">
+              <div class="fact"><div class="fact-label">Customer base</div><div class="fact-value">${z.facts.customers}</div></div>
+              <div class="fact"><div class="fact-label">Production system</div><div class="fact-value">${z.facts.production}</div></div>
+              <div class="fact"><div class="fact-label">Coverage reality</div><div class="fact-value">${z.facts.travel}</div></div>
+            </div>
+
+            <div class="evidence-grid">
+              ${z.evidence.map(([lens,text])=>`
+                <article class="evidence-card">
+                  <span class="evidence-tag">${lens}</span>
+                  <p>${text}</p>
+                </article>
+              `).join("")}
+            </div>
+
+            <div class="signal-row">
+              ${z.signals.map(([text,kind])=>`<span class="signal ${kind}">${text}</span>`).join("")}
+            </div>
+
+            <div class="evidence-board">
+              <article class="board-card">
+                <label for="${z.id}-type">Dominant opportunity type</label>
+                <select id="${z.id}-type">
+                  <option value="">Choose a territory posture</option>
+                  <option value="Invest and build">Invest and build</option>
+                  <option value="Defend and differentiate">Defend and differentiate</option>
+                  <option value="Focused vertical play">Focused vertical play</option>
+                  <option value="Segment selectively">Segment selectively</option>
+                  <option value="Monitor and maintain">Monitor and maintain</option>
+                </select>
+              </article>
+
+              <article class="board-card">
+                <label for="${z.id}-driver">Most important territory driver</label>
+                <select id="${z.id}-driver">
+                  <option value="">Choose the strongest driver</option>
+                  <option value="Geography">Geography</option>
+                  <option value="Production">Production systems</option>
+                  <option value="Trends">Trends</option>
+                  <option value="Regulation">Regulation</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Competition">Competition</option>
+                  <option value="Customer concentration">Customer concentration</option>
+                </select>
+              </article>
+
+              <article class="board-card">
+                <label for="${z.id}-risk">Biggest territory risk</label>
+                <select id="${z.id}-risk">
+                  <option value="">Choose the main risk</option>
+                  <option value="Coverage cost">Coverage cost</option>
+                  <option value="Competitive strength">Competitive strength</option>
+                  <option value="Low readiness">Low customer readiness</option>
+                  <option value="Fragmented demand">Fragmented demand</option>
+                  <option value="Implementation burden">Implementation burden</option>
+                  <option value="Unclear timing">Unclear timing</option>
+                </select>
+              </article>
+
+              <article class="board-card">
+                <label for="${z.id}-action">Best immediate action</label>
+                <select id="${z.id}-action">
+                  <option value="">Choose the best next action</option>
+                  <option value="Pilot">Launch a pilot</option>
+                  <option value="Key accounts">Build key-account plans</option>
+                  <option value="Partner">Develop a channel or service partner</option>
+                  <option value="Segment">Segment the market further</option>
+                  <option value="Discovery">Conduct more discovery</option>
+                  <option value="Monitor">Monitor and maintain relationships</option>
+                </select>
+              </article>
+
+              <article class="board-card" style="grid-column:1/-1;">
+                <label for="${z.id}-note">Evidence note</label>
+                <textarea id="${z.id}-note" placeholder="Which evidence matters most, and what uncertainty remains?">${saved.note}</textarea>
+              </article>
+            </div>
+
+            <div class="buttons">
+              <button id="saveZone" class="btn btn-gold" type="button">Save zone analysis</button>
+              <button id="nextZone" class="btn btn-secondary" type="button">${activeZone===zones.length-1?"Review completed zones":"Save and open next zone"}</button>
+            </div>
+
+            <div id="zoneFeedback" class="feedback" aria-live="polite"></div>
+          </div>
+        `;
+
+        document.getElementById(`${z.id}-type`).value=saved.type;
+        document.getElementById(`${z.id}-driver`).value=saved.driver;
+        document.getElementById(`${z.id}-risk`).value=saved.risk;
+        document.getElementById(`${z.id}-action`).value=saved.action;
+
+        document.getElementById(`${z.id}-type`).addEventListener("change",e=>analysis[z.id].type=e.target.value);
+        document.getElementById(`${z.id}-driver`).addEventListener("change",e=>analysis[z.id].driver=e.target.value);
+        document.getElementById(`${z.id}-risk`).addEventListener("change",e=>analysis[z.id].risk=e.target.value);
+        document.getElementById(`${z.id}-action`).addEventListener("change",e=>analysis[z.id].action=e.target.value);
+        document.getElementById(`${z.id}-note`).addEventListener("input",e=>analysis[z.id].note=e.target.value);
+        document.getElementById("saveZone").addEventListener("click",()=>saveZone(false));
+        document.getElementById("nextZone").addEventListener("click",()=>saveZone(true));
+      }
+
+      function saveZone(moveNext){
+        const z=zones[activeZone];
+        const saved=analysis[z.id];
+        const guide=zoneGuidance[z.id];
+        const feedback=document.getElementById("zoneFeedback");
+
+        if(!saved.type || !saved.driver || !saved.risk || !saved.action){
+          feedback.className="feedback risk show";
+          feedback.innerHTML="<strong>Complete the zone analysis.</strong> Choose a territory posture, main driver, primary risk, and immediate action.";
+          return;
+        }
+
+        reviewed.add(z.id);
+
+        const postureMatch=saved.type===z.bestType;
+        const driverMatch=guide.drivers.includes(saved.driver);
+        const riskMatch=guide.risks.includes(saved.risk);
+        const actionMatch=guide.actions.includes(saved.action);
+        const score=[postureMatch,driverMatch,riskMatch,actionMatch].filter(Boolean).length;
+
+        feedback.className=`feedback ${score>=3?"good":"watch"} show`;
+        feedback.innerHTML=`
+          <strong>${score>=3?"Strong territory reasoning":"Good start—refine the evidence connection"}.</strong><br>
+          <strong>Posture:</strong> ${postureMatch ? `Your choice of ${saved.type} is well aligned.` : `A stronger posture is ${z.bestType}.`}<br>
+          <strong>Driver:</strong> ${driverMatch ? `${saved.driver} is a defensible primary driver.` : `The strongest drivers are ${guide.drivers.join(", ")}.`}<br>
+          <strong>Risk:</strong> ${riskMatch ? `${saved.risk} is an important execution risk.` : `A more significant risk is ${guide.risks.join(" or ")}.`}<br>
+          <strong>Action:</strong> ${actionMatch ? `${saved.action} is a practical next move.` : `Consider ${guide.actions.join(" or ")}.`}<br><br>
+          ${guide.explanation}
+        `;
+
+        document.getElementById("buildMatrix").disabled=reviewed.size!==zones.length;
+
+        if(moveNext && activeZone<zones.length-1){
+          setTimeout(()=>{
+            activeZone+=1;
+            renderMap();
+            renderZone();
+            document.getElementById("territoryMap").scrollIntoView({behavior:"smooth",block:"start"});
+          },300);
+        }
+      }
+
+      function avgScore(z){
+        const vals=Object.values(z.benchmark);
+        return vals.reduce((a,b)=>a+b,0)/vals.length;
+      }
+
+      function scoreClass(v){
+        if(v>=4)return"cell-high";
+        if(v>=3)return"cell-mid";
+        return"cell-low";
+      }
+
+      function renderMatrix(){
+        const matrix=document.getElementById("matrixContainer");
+        matrix.innerHTML=`
+          <div class="matrix-wrap">
+            <table class="matrix">
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  ${lenses.map(l=>`<th>${l}</th>`).join("")}
+                  <th>Overall</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${zones.map(z=>`
+                  <tr>
+                    <th>${z.name}</th>
+                    ${lenses.map(l=>`<td class="${scoreClass(z.benchmark[l])}">${z.benchmark[l]}</td>`).join("")}
+                    <td class="${scoreClass(Math.round(avgScore(z)))}">${avgScore(z).toFixed(1)}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        const grid=document.getElementById("priorityGrid");
+        grid.innerHTML=zones.map(z=>`
+          <article class="priority-card" data-priority-card="${z.id}">
+            <button type="button" data-priority-zone="${z.id}">
+              <span class="priority-score">${avgScore(z).toFixed(1)}</span>
+              <h3>${z.name}</h3>
+              <p>${z.bestType}. ${z.profile}</p>
+            </button>
+            <div style="margin-top:12px;">
+              <label for="${z.id}-priority" style="display:block;margin-bottom:6px;font-weight:800;">Priority role</label>
+              <select id="${z.id}-priority" data-priority-select="${z.id}">
+                <option value="">Not selected</option>
+                <option value="primary">Primary focus</option>
+                <option value="secondary">Secondary focus</option>
+                <option value="monitor">Monitor / maintain</option>
+              </select>
+            </div>
+          </article>
+        `).join("");
+
+        grid.querySelectorAll("[data-priority-select]").forEach(select=>{
+          select.addEventListener("change",()=>{
+            const id=select.dataset.prioritySelect;
+            const val=select.value;
+
+            if(val==="primary"){
+              primaryZone=id;
+              grid.querySelectorAll("[data-priority-select]").forEach(other=>{
+                if(other!==select && other.value==="primary") other.value="";
+              });
+            }
+            if(val==="secondary"){
+              secondaryZone=id;
+              grid.querySelectorAll("[data-priority-select]").forEach(other=>{
+                if(other!==select && other.value==="secondary") other.value="";
+              });
+            }
+
+            if(val==="" && primaryZone===id) primaryZone="";
+            if(val==="" && secondaryZone===id) secondaryZone="";
+
+            grid.querySelectorAll("[data-priority-card]").forEach(card=>{
+              const cid=card.dataset.priorityCard;
+              card.classList.toggle("selected",cid===primaryZone||cid===secondaryZone);
+            });
+          });
+        });
+      }
+
+      function analyzeStrategy(){
+        const feedback=document.getElementById("strategyFeedback");
+        const reason=document.getElementById("primaryReason").value.trim();
+        const question=document.getElementById("nextQuestion").value.trim();
+
+        if(!primaryZone || !secondaryZone){
+          feedback.className="feedback risk show";
+          feedback.innerHTML="<strong>Select both a primary and secondary zone.</strong> A territory strategy requires focus as well as a deliberate second priority.";
+          return;
+        }
+        if(primaryZone===secondaryZone){
+          feedback.className="feedback risk show";
+          feedback.innerHTML="<strong>Choose two different zones.</strong>";
+          return;
+        }
+
+        const primary=zones.find(z=>z.id===primaryZone);
+        const secondary=zones.find(z=>z.id===secondaryZone);
+        const evidenceStrong=reason.length>=60;
+        const uncertaintyStrong=question.length>=30;
+        const evidenceBest=primaryZone==="south" || primaryZone==="north" || primaryZone==="east";
+
+        const primaryGuide=zoneGuidance[primary.id];
+        const secondaryGuide=zoneGuidance[secondary.id];
+
+        feedback.className=`feedback ${(evidenceStrong&&uncertaintyStrong&&evidenceBest)?"good":"watch"} show`;
+        feedback.innerHTML=`
+          <strong>${evidenceBest?"Defensible territory focus":"Review the evidence balance"}.</strong><br>
+          You selected <strong>${primary.name}</strong> as primary and <strong>${secondary.name}</strong> as secondary.<br><br>
+          <strong>Primary-zone coaching:</strong> ${primaryGuide.explanation}<br><br>
+          <strong>Secondary-zone coaching:</strong> ${secondaryGuide.explanation}<br><br>
+          <strong>Rationale quality:</strong> ${evidenceStrong?"Your explanation is detailed enough to support a team discussion.":"Strengthen the rationale with specific evidence from at least three lenses."}<br>
+          <strong>Learning agenda:</strong> ${uncertaintyStrong?"You identified a useful next question, which makes the strategy testable.":"Add one specific uncertainty the team should investigate before committing resources."}
+        `;
+        document.getElementById("coachingNext").disabled=false;
+      }
+
+      function renderCoaching(){
+        const primary=zones.find(z=>z.id===primaryZone);
+        const secondary=zones.find(z=>z.id===secondaryZone);
+        const reason=document.getElementById("primaryReason").value.trim();
+        const question=document.getElementById("nextQuestion").value.trim();
+
+        document.getElementById("coachingContainer").innerHTML=`
+          <div class="coach-grid">
+            <article class="coach-card best">
+              <h3>Your primary territory hypothesis</h3>
+              <p><strong>${primary.name}</strong></p>
+              <p>${primary.coaching}</p>
+              <p><strong>Your selected posture:</strong> ${analysis[primary.id].type || "Not selected"}</p>
+              <p><strong>Your main driver:</strong> ${analysis[primary.id].driver || "Not selected"}</p>
+              <p><strong>Your main risk:</strong> ${analysis[primary.id].risk || "Not selected"}</p>
+              <p><strong>Your immediate action:</strong> ${analysis[primary.id].action || "Not selected"}</p>
+              <p><strong>Your rationale:</strong> ${reason || "No rationale entered."}</p>
+            </article>
+
+            <article class="coach-card watch-card">
+              <h3>Your secondary territory hypothesis</h3>
+              <p><strong>${secondary.name}</strong></p>
+              <p>${secondary.coaching}</p>
+              <p><strong>Your selected posture:</strong> ${analysis[secondary.id].type || "Not selected"}</p>
+              <p><strong>Your main driver:</strong> ${analysis[secondary.id].driver || "Not selected"}</p>
+              <p><strong>Your main risk:</strong> ${analysis[secondary.id].risk || "Not selected"}</p>
+              <p><strong>Your immediate action:</strong> ${analysis[secondary.id].action || "Not selected"}</p>
+              <p><strong>Your next question:</strong> ${question || "No next question entered."}</p>
+            </article>
+          </div>
+
+          <div class="strategy-summary">
+            <strong>Evidence-based interpretation:</strong>
+            Southern Specialty Cluster is the strongest growth hypothesis because regulation,
+            downstream expectations, technology interest, and limited competition reinforce one another.
+            North Ridge remains highly valuable but requires differentiation against entrenched competitors.
+            The Eastern Dairy Belt offers a focused vertical play, while Central Mixed Market should be
+            segmented carefully and River Plains should be monitored rather than broadly pursued.
+          </div>
+        `;
+      }
+
+      function reset(){
+        zones.forEach(z=>analysis[z.id]={type:"",driver:"",risk:"",action:"",note:""});
+        reviewed.clear();
+        activeZone=0;
+        primaryZone="";
+        secondaryZone="";
+        document.getElementById("primaryReason").value="";
+        document.getElementById("nextQuestion").value="";
+        document.getElementById("buildMatrix").disabled=true;
+        document.getElementById("coachingNext").disabled=true;
+        renderMap();
+        renderZone();
+        showStep(0);
+      }
+
+      document.getElementById("openTerritory").addEventListener("click",()=>{
+        renderMap();
+        renderZone();
+        showStep(1);
+      });
+      document.getElementById("territoryBack").addEventListener("click",()=>showStep(0));
+      document.getElementById("buildMatrix").addEventListener("click",()=>{
+        renderMatrix();
+        showStep(2);
+      });
+      document.getElementById("matrixBack").addEventListener("click",()=>showStep(1));
+      document.getElementById("analyzeStrategy").addEventListener("click",analyzeStrategy);
+      document.getElementById("coachingNext").addEventListener("click",()=>{
+        renderCoaching();
+        showStep(3);
+      });
+      document.getElementById("coachingBack").addEventListener("click",()=>showStep(2));
+      document.getElementById("finish").addEventListener("click",()=>showStep(4));
+      document.getElementById("restart").addEventListener("click",reset);
+      document.getElementById("print").addEventListener("click",()=>window.print());
+    })();
+  </script>
+</body>
+</html>
